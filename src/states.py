@@ -1,0 +1,4 @@
+SOCIAL_MEDIA = '0'
+MY_CV = '1'
+MY_JOURNEY = '2'
+CONTACT_ME = '3'
