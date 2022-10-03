@@ -1,15 +1,15 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from states import SOCIAL_MEDIA, MY_CV, MY_JOURNEY, CONTACT_ME
+from states import INTRO, CV, SOCIAL_MEDIA, CONTACT_ME
 
-welcome_keyboard = InlineKeyboardMarkup(
+main_menu_keyboard = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton('Social media 👤', callback_data=SOCIAL_MEDIA),
-            InlineKeyboardButton('My CV 📋', callback_data=MY_CV)
+            InlineKeyboardButton('Intro 👋🏻', callback_data=INTRO),
+            InlineKeyboardButton('CV 📋', callback_data=CV)
         ],
 [
-            InlineKeyboardButton('My journey 🏂', callback_data=MY_JOURNEY),
+            InlineKeyboardButton('Social 🌐', callback_data=SOCIAL_MEDIA),
             InlineKeyboardButton('Contact me ✉️', callback_data=CONTACT_ME)
         ],
     ]

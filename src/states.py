@@ -1,4 +1,4 @@
-SOCIAL_MEDIA = '0'
-MY_CV = '1'
-MY_JOURNEY = '2'
+INTRO = '0'
+CV = '1'
+SOCIAL_MEDIA = '2'
 CONTACT_ME = '3'
