@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from .states import BACK_TO_MENU
+from src.states import MAIN_MENU
 
 social_media_keyboard = InlineKeyboardMarkup(
     [
@@ -9,7 +9,7 @@ social_media_keyboard = InlineKeyboardMarkup(
             InlineKeyboardButton('Github 👨🏻‍💻', url='https://github.com/eduardblumental')
         ],
         [
-            InlineKeyboardButton('Back to menu 👀', callback_data=BACK_TO_MENU)
+            InlineKeyboardButton('Back to menu 👀', callback_data=MAIN_MENU)
         ]
     ]
 )
