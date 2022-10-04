@@ -10,7 +10,7 @@ from telegram.ext import (
 
 
 from src.keyboards import main_menu_keyboard
-from src.states import SOCIAL_MEDIA, MAIN_MENU
+from src.states import SOCIAL, MAIN_MENU
 
 from .keyboards import social_media_keyboard
 
@@ -25,7 +25,7 @@ async def q_handle_start_social(update: Update, context: ContextTypes.DEFAULT_TY
     if query:
         await query.answer()
         await query.edit_message_text(**message_kwargs)
-        return SOCIAL_MEDIA
+        return SOCIAL
     else:
         await update.effective_message.reply_text(**message_kwargs)
 
@@ -48,8 +48,8 @@ async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q_handle_start_social(update, context)
 
 
-social_media_handlers = [
-    CallbackQueryHandler(callback=q_handle_start_social, pattern=f'^{SOCIAL_MEDIA}$'),
+social_handlers = [
+    CallbackQueryHandler(callback=q_handle_start_social, pattern=f'^{SOCIAL}$'),
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
     MessageHandler(callback=handle_error, filters=filters.TEXT)
 ]

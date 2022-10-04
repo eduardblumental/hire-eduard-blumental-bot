@@ -1,3 +1,3 @@
-from src.states import SOCIAL_MEDIA
+from src.states import SOCIAL
 
-BACK_TO_MENU = SOCIAL_MEDIA + '0'
+BACK_TO_MENU = SOCIAL + '0'

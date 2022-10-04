@@ -1,3 +1,5 @@
+import os
+
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -32,17 +34,40 @@ async def q_handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYP
 async def q_handle_my_journey(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    await query.delete_message()
+
+    await context.bot.send_video(
+        chat_id=update.effective_chat.id,
+        video=open(os.path.join('../static', 'my_journey.mp4'), 'rb'),
+        caption='My journey 🏂',
+        reply_markup=video_menu_keyboard
+    )
+
+    return VIDEO_MENU
 
 
 async def q_handle_why_hire_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    await query.delete_message()
+
+    await context.bot.send_video(
+        chat_id=update.effective_chat.id,
+        video=open(os.path.join('../static', 'why_hire_me.mp4'), 'rb'),
+        caption='Why hire me 🔮',
+        reply_markup=video_menu_keyboard
+    )
+
+    return VIDEO_MENU
 
 
 async def q_handle_back_to_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(
+    await query.delete_message()
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
         text='Intro menu',
         reply_markup=intro_keyboard
     )
@@ -72,7 +97,7 @@ async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 intro_conversation_handler = ConversationHandler(
     entry_points=[
         CallbackQueryHandler(callback=q_handle_my_journey, pattern=f'^{MY_JOURNEY}$'),
-        CallbackQueryHandler(callback=q_handle_why_hire_me, pattern=f'^{WHY_HIRE_ME}$'),
+        CallbackQueryHandler(callback=q_handle_why_hire_me, pattern=f'^{WHY_HIRE_ME}$')
     ],
     states={
         VIDEO_MENU: [
@@ -83,3 +108,9 @@ intro_conversation_handler = ConversationHandler(
         MessageHandler(callback=handle_error, filters=filters.ALL)
     ]
 )
+
+intro_handlers = [
+    CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
+    intro_conversation_handler
+]
+

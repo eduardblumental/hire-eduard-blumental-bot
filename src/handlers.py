@@ -8,11 +8,11 @@ from telegram.ext import (
     filters
 )
 
-from intro.handlers import q_handle_start_intro, intro_conversation_handler
-from social.handlers import q_handle_start_social, social_media_handlers
+from intro.handlers import q_handle_start_intro, intro_handlers
+from social.handlers import q_handle_start_social, social_handlers
 
 from keyboards import main_menu_keyboard
-from states import INTRO, SOCIAL_MEDIA
+from states import INTRO, SOCIAL
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -31,11 +31,12 @@ async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 main_conversation_handler = ConversationHandler(
     entry_points=[
-        CallbackQueryHandler(callback=q_handle_start_social, pattern=f'^{SOCIAL_MEDIA}$')
+        CallbackQueryHandler(callback=q_handle_start_intro, pattern=f'^{INTRO}$'),
+        CallbackQueryHandler(callback=q_handle_start_social, pattern=f'^{SOCIAL}$')
     ],
     states={
-        INTRO: intro_conversation_handler,
-        SOCIAL_MEDIA: social_media_handlers
+        INTRO: intro_handlers,
+        SOCIAL: social_handlers
     },
     fallbacks=[
         MessageHandler(callback=handle_error, filters=filters.ALL)

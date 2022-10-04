@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from states import INTRO, CV, SOCIAL_MEDIA, CONTACT_ME
+from states import INTRO, CV, SOCIAL, CONTACT_ME
 
 main_menu_keyboard = InlineKeyboardMarkup(
     [
@@ -9,7 +9,7 @@ main_menu_keyboard = InlineKeyboardMarkup(
             InlineKeyboardButton('CV 📋', callback_data=CV)
         ],
 [
-            InlineKeyboardButton('Social 🌐', callback_data=SOCIAL_MEDIA),
+            InlineKeyboardButton('Social 🌐', callback_data=SOCIAL),
             InlineKeyboardButton('Contact me ✉️', callback_data=CONTACT_ME)
         ],
     ]
