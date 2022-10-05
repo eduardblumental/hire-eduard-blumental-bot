@@ -16,7 +16,7 @@ intro_keyboard = InlineKeyboardMarkup(
     ]
 )
 
-video_menu_keyboard = InlineKeyboardMarkup(
+watching_keyboard = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton('Back to menu 👀', callback_data=INTRO)

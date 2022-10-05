@@ -12,8 +12,8 @@ from telegram.ext import (
 from src.keyboards import main_menu_keyboard
 from src.states import INTRO, MAIN_MENU
 
-from .keyboards import intro_keyboard, video_menu_keyboard
-from .states import MY_JOURNEY, WHY_HIRE_ME, VIDEO_MENU
+from .keyboards import intro_keyboard, watching_keyboard
+from .states import MY_JOURNEY, WHY_HIRE_ME, WATCHING
 
 
 async def q_handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -40,10 +40,10 @@ async def q_handle_my_journey(update: Update, context: ContextTypes.DEFAULT_TYPE
         chat_id=update.effective_chat.id,
         video=context.bot_data.get('my_journey.mp4'),
         caption='My journey 🏂',
-        reply_markup=video_menu_keyboard
+        reply_markup=watching_keyboard
     )
 
-    return VIDEO_MENU
+    return WATCHING
 
 
 async def q_handle_why_hire_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -53,12 +53,12 @@ async def q_handle_why_hire_me(update: Update, context: ContextTypes.DEFAULT_TYP
 
     await context.bot.send_video(
         chat_id=update.effective_chat.id,
-        video=context.bot_data['why_hire_me.mp4'],
+        video=context.bot_data.get('why_hire_me.mp4'),
         caption='Why hire me 🔮',
-        reply_markup=video_menu_keyboard
+        reply_markup=watching_keyboard
     )
 
-    return VIDEO_MENU
+    return WATCHING
 
 
 async def q_handle_back_to_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -100,7 +100,7 @@ intro_conversation_handler = ConversationHandler(
         CallbackQueryHandler(callback=q_handle_why_hire_me, pattern=f'^{WHY_HIRE_ME}$')
     ],
     states={
-        VIDEO_MENU: [
+        WATCHING: [
             CallbackQueryHandler(callback=q_handle_back_to_intro, pattern=f'^{INTRO}$'),
         ]
     },
