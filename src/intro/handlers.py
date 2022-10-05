@@ -38,7 +38,7 @@ async def q_handle_my_journey(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     await context.bot.send_video(
         chat_id=update.effective_chat.id,
-        video=open(os.path.join('../static', 'my_journey.mp4'), 'rb'),
+        video=context.bot_data.get('my_journey.mp4'),
         caption='My journey 🏂',
         reply_markup=video_menu_keyboard
     )
@@ -53,7 +53,7 @@ async def q_handle_why_hire_me(update: Update, context: ContextTypes.DEFAULT_TYP
 
     await context.bot.send_video(
         chat_id=update.effective_chat.id,
-        video=open(os.path.join('../static', 'why_hire_me.mp4'), 'rb'),
+        video=context.bot_data['why_hire_me.mp4'],
         caption='Why hire me 🔮',
         reply_markup=video_menu_keyboard
     )

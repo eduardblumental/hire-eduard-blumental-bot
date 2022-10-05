@@ -1,3 +1,5 @@
+import os
+
 from telegram import Update
 from telegram.ext import (
     CommandHandler,
@@ -13,6 +15,22 @@ from social.handlers import q_handle_start_social, social_handlers
 
 from keyboards import main_menu_keyboard
 from states import INTRO, SOCIAL
+
+
+async def handle_load_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text('Uploading data...')
+
+    for video in os.listdir('../static'):
+        msg = await context.bot.send_video(
+            chat_id=update.effective_chat.id,
+            video=open(os.path.join('../static', video), 'rb'),
+            read_timeout=10000,
+            write_timeout=10000
+        )
+
+        context.bot_data[video] = msg.video.file_id
+
+    await update.message.reply_text('Data has been uploaded..')
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
