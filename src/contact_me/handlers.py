@@ -1,3 +1,5 @@
+import os
+
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -12,7 +14,7 @@ from src.keyboards import main_menu_keyboard
 from src.states import CONTACT_ME, MAIN_MENU
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
-from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, CONTACT_PERSON, FULL_FORM, SUBMIT
+from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, CONTACT_PERSON, SUBMIT
 
 
 async def q_handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -81,19 +83,16 @@ async def handle_salary_range(update: Update, context: ContextTypes.DEFAULT_TYPE
     return CONTACT_PERSON
 
 
-async def handle_cantact_person(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_contact_person(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['contact_person'] = update.message.text
-
-    form = f"""<b>Company name<b>\n{context.user_data.get('company_name')}\n
-    <b>Position name<b>\n{context.user_data.get('position_name')}\n
-    <b>Position description<b>\n{context.user_data.get('position_description')}\n
-    <b>Salary range<b>\n{context.user_data.get('salary_range')}\n
-    <b>Contact person<b>\n{context.user_data.get('contact_person')}\n
-    Is everything correct?
-    """
+    context.user_data['form'] = f"<b>Company name</b>\n{context.user_data.get('company_name')}\n\n" \
+                                f"<b>Position name</b>\n{context.user_data.get('position_name')}\n\n" \
+                                f"<b>Position description</b>\n{context.user_data.get('position_description')}\n\n" \
+                                f"<b>Salary range</b>\n{context.user_data.get('salary_range')}\n\n" \
+                                f"<b>Contact person</b>\n{context.user_data.get('contact_person')}"
 
     await update.message.reply_text(
-        text=form,
+        text=f"{context.user_data.get('form')}\n\nIs everything correct?",
         parse_mode=ParseMode.HTML,
         reply_markup=submit_keyboard
     )
@@ -104,28 +103,36 @@ async def handle_cantact_person(update: Update, context: ContextTypes.DEFAULT_TY
 async def q_handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(
-        text='Please, type in your company name.',
-        reply_markup=form_keyboard
-    )
+    await q_handle_start_contact_me(update, context)
 
-    return COMPANY_NAME
+    return ConversationHandler.END
 
 
 async def q_handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['company_name'] = update.message.text
-    await update.message.reply_text(
-        text='Thank you for reaching out. I will get back to you at my earliest convenience. Main menu.',
-        reply_markup=main_menu_keyboard
+    sender = update.effective_user
+    msg = f"New vacancy from @{sender.username} a.k.a. {sender.first_name} " \
+          f"{sender.last_name}\n\n{context.user_data.get('form')}"
+
+    await context.bot.send_message(
+        chat_id=os.environ.get('TELEGRAM_USER_ID'),
+        text=msg,
+        parse_mode=ParseMode.HTML
     )
 
-    return ConversationHandler.END
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text='Thank you for reaching out. I will get back to you at my earliest convenience.'
+    )
+
+    await q_handle_back_to_menu(update, context)
 
 
 async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(
+    await query.delete_message()
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
         text='Main menu',
         reply_markup=main_menu_keyboard
     )
@@ -156,20 +163,23 @@ contact_me_conversation_handler = ConversationHandler(
             MessageHandler(callback=handle_position_description, filters=filters.TEXT and ~filters.COMMAND)
         ],
         SALARY_RANGE: [
-            MessageHandler(callback=handle_salary_range, filters=filters.Regex(r'\d+-\d+ [NIS|USD|EUR]') and ~filters.COMMAND)
+            MessageHandler(callback=handle_salary_range,
+                           filters=filters.Regex(r'\d+-\d+ [NIS|USD|EUR]') and ~filters.COMMAND)
         ],
         CONTACT_PERSON: [
-            MessageHandler(callback=handle_salary_range, filters=filters.TEXT and ~filters.COMMAND)
+            MessageHandler(callback=handle_contact_person, filters=filters.TEXT and ~filters.COMMAND)
         ]
     },
     fallbacks=[
+        CallbackQueryHandler(callback=q_handle_cancel, pattern=f'^{CONTACT_ME}$'),
         MessageHandler(callback=handle_error, filters=filters.ALL)
     ]
 )
 
-cv_handlers = [
-    CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
+contact_me_handlers = [
     contact_me_conversation_handler,
+    CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
+    CallbackQueryHandler(callback=q_handle_submit, pattern=f'^{SUBMIT}$'),
+    CallbackQueryHandler(callback=q_handle_start_contact_me, pattern=f'^{CONTACT_ME}$'),
     MessageHandler(callback=handle_error, filters=filters.ALL)
 ]
-

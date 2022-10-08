@@ -93,7 +93,8 @@ cv_conversation_handler = ConversationHandler(
 )
 
 cv_handlers = [
+    cv_conversation_handler,
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
-    cv_conversation_handler
+    MessageHandler(callback=handle_error, filters=filters.ALL)
 ]
 

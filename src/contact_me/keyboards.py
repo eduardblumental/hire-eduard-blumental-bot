@@ -34,7 +34,7 @@ submit_keyboard = InlineKeyboardMarkup(
 
         ],
         [
-            InlineKeyboardButton('Back to menu 👀', callback_data=MAIN_MENU)
+            InlineKeyboardButton('Cancel  🙅🏻‍♀️', callback_data=CONTACT_ME)
         ]
     ]
 )

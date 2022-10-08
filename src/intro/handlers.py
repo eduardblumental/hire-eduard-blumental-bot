@@ -110,7 +110,8 @@ intro_conversation_handler = ConversationHandler(
 )
 
 intro_handlers = [
+    intro_conversation_handler,
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
-    intro_conversation_handler
+    MessageHandler(callback=handle_error, filters=filters.ALL)
 ]
 
