@@ -15,21 +15,15 @@ from src.states import CONTACT_ME, MAIN_MENU
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
 from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, CONTACT_PERSON, SUBMIT
+from src.utils import go_to_menu, start_module, handle_error
 
 
 async def q_handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message_kwargs = {
-        'text': 'My contacts',
-        'reply_markup': reach_out_keyboard
-    }
-
-    query = update.callback_query
-    if query:
-        await query.answer()
-        await query.edit_message_text(**message_kwargs)
-        return CONTACT_ME
-    else:
-        await update.effective_message.reply_text(**message_kwargs)
+    await start_module(
+        update=update, context=context,
+        text='My Contacts',
+        reply_markup=reach_out_keyboard, return_value=CONTACT_ME
+    )
 
 
 async def q_handle_reach_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -119,33 +113,20 @@ async def q_handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode=ParseMode.HTML
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+    await update.callback_query.edit_message_text(
         text='Thank you for reaching out. I will get back to you at my earliest convenience.'
     )
 
-    await q_handle_back_to_menu(update, context)
+    await go_to_menu(update, context)
 
 
 async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await query.delete_message()
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text='Main menu',
-        reply_markup=main_menu_keyboard
-    )
-
-    return ConversationHandler.END
+    await go_to_menu(update, context)
 
 
-async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.effective_message.reply_text(
-        text=f'I am not sure what {update.message.text} means. Please, use the buttons 💁🏻‍♀️'
-    )
-
-    await q_handle_start_contact_me(update, context)
+async def handle_contect_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_error(update=update, context=context, callback=q_handle_start_contact_me,
+                       error_message='Error')
 
 
 contact_me_conversation_handler = ConversationHandler(
@@ -172,7 +153,7 @@ contact_me_conversation_handler = ConversationHandler(
     },
     fallbacks=[
         CallbackQueryHandler(callback=q_handle_cancel, pattern=f'^{CONTACT_ME}$'),
-        MessageHandler(callback=handle_error, filters=filters.ALL)
+        MessageHandler(callback=handle_contect_me_error, filters=filters.ALL)
     ]
 )
 
@@ -181,5 +162,5 @@ contact_me_handlers = [
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
     CallbackQueryHandler(callback=q_handle_submit, pattern=f'^{SUBMIT}$'),
     CallbackQueryHandler(callback=q_handle_start_contact_me, pattern=f'^{CONTACT_ME}$'),
-    MessageHandler(callback=handle_error, filters=filters.ALL)
+    MessageHandler(callback=handle_contect_me_error, filters=filters.ALL)
 ]

@@ -14,21 +14,15 @@ from src.states import INTRO, MAIN_MENU
 
 from .keyboards import intro_keyboard, watching_keyboard
 from .states import MY_JOURNEY, WHY_HIRE_ME, WATCHING
+from src.utils import go_to_menu, start_module, handle_error
 
 
 async def q_handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message_kwargs = {
-        'text': 'Introduction',
-        'reply_markup': intro_keyboard
-    }
-
-    query = update.callback_query
-    if query:
-        await query.answer()
-        await query.edit_message_text(**message_kwargs)
-        return INTRO
-    else:
-        await update.effective_message.reply_text(**message_kwargs)
+    await start_module(
+        update=update, context=context,
+        text='Introduction',
+        reply_markup=intro_keyboard, return_value=INTRO
+    )
 
 
 async def q_handle_my_journey(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -86,12 +80,9 @@ async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TY
     return ConversationHandler.END
 
 
-async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.effective_message.reply_text(
-        text=f'I am not sure what {update.message.text} means. Please, use the buttons 💁🏻‍♀️'
-    )
-
-    await q_handle_start_intro(update, context)
+async def handle_intro_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_error(update=update, context=context, callback=q_handle_start_intro,
+                       error_message='Error')
 
 
 intro_conversation_handler = ConversationHandler(
@@ -105,13 +96,13 @@ intro_conversation_handler = ConversationHandler(
         ]
     },
     fallbacks=[
-        MessageHandler(callback=handle_error, filters=filters.ALL)
+        MessageHandler(callback=handle_intro_error, filters=filters.ALL)
     ]
 )
 
 intro_handlers = [
     intro_conversation_handler,
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
-    MessageHandler(callback=handle_error, filters=filters.ALL)
+    MessageHandler(callback=handle_intro_error, filters=filters.ALL)
 ]
 

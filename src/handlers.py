@@ -17,6 +17,7 @@ from contact_me.handlers import q_handle_start_contact_me, contact_me_handlers
 
 from keyboards import main_menu_keyboard
 from states import INTRO, SOCIAL, CV, CONTACT_ME
+from utils import go_to_menu
 
 
 async def handle_load_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,10 +43,7 @@ async def handle_load_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        text='Hi!',
-        reply_markup=main_menu_keyboard
-    )
+    await go_to_menu(update, context)
 
 
 async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
