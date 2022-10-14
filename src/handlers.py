@@ -15,7 +15,6 @@ from social.handlers import q_handle_start_social, social_handlers
 from cv.handlers import q_handle_start_cv, cv_handlers
 from contact_me.handlers import q_handle_start_contact_me, contact_me_handlers
 
-from keyboards import main_menu_keyboard
 from states import INTRO, SOCIAL, CV, CONTACT_ME
 from utils import go_to_menu
 

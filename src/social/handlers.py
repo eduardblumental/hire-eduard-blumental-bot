@@ -1,6 +1,5 @@
 from telegram import Update
 from telegram.ext import (
-    CommandHandler,
     CallbackQueryHandler,
     MessageHandler,
     ConversationHandler,
@@ -8,8 +7,6 @@ from telegram.ext import (
     filters
 )
 
-
-from src.keyboards import main_menu_keyboard
 from src.states import SOCIAL, MAIN_MENU
 from src.utils import go_to_menu, start_module, handle_error
 
@@ -19,19 +16,13 @@ from .keyboards import social_media_keyboard
 async def q_handle_start_social(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='Online Presence',
-        reply_markup=social_media_keyboard, return_value=SOCIAL
+        text='Online Presence', reply_markup=social_media_keyboard
     )
+    return SOCIAL
 
 
 async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text(
-        text='Main menu',
-        reply_markup=main_menu_keyboard
-    )
-
+    await go_to_menu(update, context)
     return ConversationHandler.END
 
 

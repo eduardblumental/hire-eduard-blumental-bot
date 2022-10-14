@@ -21,9 +21,9 @@ from src.utils import go_to_menu, start_module, handle_error
 async def q_handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='My Contacts',
-        reply_markup=reach_out_keyboard, return_value=CONTACT_ME
+        text='Contact me', reply_markup=reach_out_keyboard
     )
+    return CONTACT_ME
 
 
 async def q_handle_reach_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -118,13 +118,15 @@ async def q_handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await go_to_menu(update, context)
+    return ConversationHandler.END
 
 
 async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
+    return ConversationHandler.END
 
 
-async def handle_contect_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_contact_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await handle_error(update=update, context=context, callback=q_handle_start_contact_me,
                        error_message='Error')
 
@@ -153,7 +155,7 @@ contact_me_conversation_handler = ConversationHandler(
     },
     fallbacks=[
         CallbackQueryHandler(callback=q_handle_cancel, pattern=f'^{CONTACT_ME}$'),
-        MessageHandler(callback=handle_contect_me_error, filters=filters.ALL)
+        MessageHandler(callback=handle_contact_me_error, filters=filters.ALL)
     ]
 )
 
@@ -162,5 +164,5 @@ contact_me_handlers = [
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
     CallbackQueryHandler(callback=q_handle_submit, pattern=f'^{SUBMIT}$'),
     CallbackQueryHandler(callback=q_handle_start_contact_me, pattern=f'^{CONTACT_ME}$'),
-    MessageHandler(callback=handle_contect_me_error, filters=filters.ALL)
+    MessageHandler(callback=handle_contact_me_error, filters=filters.ALL)
 ]

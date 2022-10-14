@@ -8,7 +8,6 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-from src.keyboards import main_menu_keyboard
 from src.states import CV, MAIN_MENU
 
 from .keyboards import cv_keyboard, reading_keyboard
@@ -19,9 +18,9 @@ from src.utils import go_to_menu, start_module, handle_error
 async def q_handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='CV',
-        reply_markup=cv_keyboard, return_value=CV
+        text='CV', reply_markup=cv_keyboard
     )
+    return CV
 
 
 async def q_handle_experience(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -55,6 +54,7 @@ async def q_handle_back_to_cv(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
+    return ConversationHandler.END
 
 
 async def handle_cv_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
