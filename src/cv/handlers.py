@@ -15,7 +15,7 @@ from .states import EXPERIENCE, EDUCATION, TECH_STACK, LANGUAGES, READING
 from src.utils import go_to_menu, start_module, handle_error
 
 
-async def q_handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
         text='CV', reply_markup=cv_keyboard
@@ -23,52 +23,44 @@ async def q_handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CV
 
 
-async def q_handle_experience(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_experience(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.delete_message()
-
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+    await query.edit_message_text(
         text=context.bot_data.get('experience.md'),
         parse_mode=ParseMode.HTML,
         reply_markup=reading_keyboard
     )
-
     return READING
 
 
-async def q_handle_back_to_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await query.delete_message()
-
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text='CV menu',
-        reply_markup=cv_keyboard
-    )
-
+async def handle_back_to_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_start_cv(update, context)
     return ConversationHandler.END
 
 
-async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
     return ConversationHandler.END
 
 
+async def handle_reading_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_error(update=update, context=context, callback=handle_start_cv)
+    return ConversationHandler.END
+
+
 async def handle_cv_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await handle_error(update=update, context=context, callback=q_handle_start_cv,
-                       error_message='Error')
+    await handle_error(update=update, context=context, callback=handle_start_cv)
 
 
 cv_conversation_handler = ConversationHandler(
     entry_points=[
-        CallbackQueryHandler(callback=q_handle_experience, pattern=f'^{EXPERIENCE}$'),
+        CallbackQueryHandler(callback=handle_experience, pattern=f'^{EXPERIENCE}$'),
     ],
     states={
         READING: [
-            CallbackQueryHandler(callback=q_handle_back_to_cv, pattern=f'^{CV}$'),
+            CallbackQueryHandler(callback=handle_back_to_cv, pattern=f'^{CV}$'),
+            MessageHandler(callback=handle_reading_error, filters=filters.ALL)
         ]
     },
     fallbacks=[
@@ -78,7 +70,7 @@ cv_conversation_handler = ConversationHandler(
 
 cv_handlers = [
     cv_conversation_handler,
-    CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
+    CallbackQueryHandler(callback=handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
     MessageHandler(callback=handle_cv_error, filters=filters.ALL)
 ]
 

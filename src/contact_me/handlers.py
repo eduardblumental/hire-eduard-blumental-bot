@@ -10,15 +10,14 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-from src.keyboards import main_menu_keyboard
 from src.states import CONTACT_ME, MAIN_MENU
+from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
 from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, CONTACT_PERSON, SUBMIT
-from src.utils import go_to_menu, start_module, handle_error
 
 
-async def q_handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
         text='Contact me', reply_markup=reach_out_keyboard
@@ -26,7 +25,7 @@ async def q_handle_start_contact_me(update: Update, context: ContextTypes.DEFAUL
     return CONTACT_ME
 
 
-async def q_handle_reach_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_reach_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(
@@ -94,15 +93,15 @@ async def handle_contact_person(update: Update, context: ContextTypes.DEFAULT_TY
     return ConversationHandler.END
 
 
-async def q_handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await q_handle_start_contact_me(update, context)
+    await handle_start_contact_me(update, context)
 
     return ConversationHandler.END
 
 
-async def q_handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_user
     msg = f"New vacancy from @{sender.username} a.k.a. {sender.first_name} " \
           f"{sender.last_name}\n\n{context.user_data.get('form')}"
@@ -121,19 +120,19 @@ async def q_handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
     return ConversationHandler.END
 
 
 async def handle_contact_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await handle_error(update=update, context=context, callback=q_handle_start_contact_me,
+    await handle_error(update=update, context=context, callback=handle_start_contact_me,
                        error_message='Error')
 
 
 contact_me_conversation_handler = ConversationHandler(
     entry_points=[
-        CallbackQueryHandler(callback=q_handle_reach_out, pattern=f'^{REACH_OUT}$')
+        CallbackQueryHandler(callback=handle_reach_out, pattern=f'^{REACH_OUT}$')
     ],
     states={
         COMPANY_NAME: [
@@ -154,15 +153,15 @@ contact_me_conversation_handler = ConversationHandler(
         ]
     },
     fallbacks=[
-        CallbackQueryHandler(callback=q_handle_cancel, pattern=f'^{CONTACT_ME}$'),
+        CallbackQueryHandler(callback=handle_cancel, pattern=f'^{CONTACT_ME}$'),
         MessageHandler(callback=handle_contact_me_error, filters=filters.ALL)
     ]
 )
 
 contact_me_handlers = [
     contact_me_conversation_handler,
-    CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
-    CallbackQueryHandler(callback=q_handle_submit, pattern=f'^{SUBMIT}$'),
-    CallbackQueryHandler(callback=q_handle_start_contact_me, pattern=f'^{CONTACT_ME}$'),
+    CallbackQueryHandler(callback=handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
+    CallbackQueryHandler(callback=handle_submit, pattern=f'^{SUBMIT}$'),
+    CallbackQueryHandler(callback=handle_start_contact_me, pattern=f'^{CONTACT_ME}$'),
     MessageHandler(callback=handle_contact_me_error, filters=filters.ALL)
 ]

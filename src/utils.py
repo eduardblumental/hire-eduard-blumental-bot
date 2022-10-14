@@ -1,12 +1,5 @@
 from telegram import Update
-from telegram.ext import (
-    CallbackQueryHandler,
-    MessageHandler,
-    ConversationHandler,
-    ContextTypes,
-    filters
-)
-
+from telegram.ext import ContextTypes
 
 from keyboards import main_menu_keyboard
 
@@ -39,10 +32,9 @@ async def go_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=update.effective_chat.id, **message_kwargs)
 
 
-async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, callback, error_message):
-    await update.effective_message.reply_text(
-        text=error_message
-    )
+async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, callback, error_message=None):
+    if not error_message:
+        error_message = f'I am not sure what "{update.message.text}" means. Please, use the buttons 💁🏻‍♀️'
 
+    await update.effective_message.reply_text(text=error_message)
     await callback(update, context)
-
