@@ -2,7 +2,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 from src.states import MAIN_MENU, CV
 
-from .states import EXPERIENCE, EDUCATION, TECH_STACK, LANGUAGES
+from .states import EXPERIENCE, EDUCATION, TECH_STACK, SOFT_SKILLS
 
 cv_keyboard = InlineKeyboardMarkup(
     [
@@ -11,8 +11,8 @@ cv_keyboard = InlineKeyboardMarkup(
             InlineKeyboardButton('Education 🎓', callback_data=EDUCATION),
         ],
         [
-            InlineKeyboardButton('Tech stack 🛠', callback_data=TECH_STACK),
-            InlineKeyboardButton('Languages 🗣', callback_data=LANGUAGES),
+            InlineKeyboardButton('Tech Stack 🛠', callback_data=TECH_STACK),
+            InlineKeyboardButton('Soft Skills 🪶', callback_data=SOFT_SKILLS),
         ],
         [
             InlineKeyboardButton('Back to menu 👀', callback_data=MAIN_MENU)

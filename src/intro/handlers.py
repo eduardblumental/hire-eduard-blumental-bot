@@ -49,7 +49,6 @@ async def handle_back_to_intro(update: Update, context: ContextTypes.DEFAULT_TYP
         text='Intro menu',
         reply_markup=intro_keyboard
     )
-
     return ConversationHandler.END
 
 

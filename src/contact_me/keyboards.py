@@ -8,7 +8,7 @@ from .states import REACH_OUT, SUBMIT
 reach_out_keyboard = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton('Reach out directly 🚀', callback_data=REACH_OUT)
+            InlineKeyboardButton('Reach me out directly 🚀', callback_data=REACH_OUT)
         ],
         [
             InlineKeyboardButton('Back to menu 👀', callback_data=MAIN_MENU)

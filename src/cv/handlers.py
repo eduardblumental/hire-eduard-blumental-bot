@@ -6,13 +6,13 @@ from telegram.ext import (
     ContextTypes,
     filters
 )
-from telegram.constants import ParseMode
 
 from src.states import CV, MAIN_MENU
+from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import cv_keyboard, reading_keyboard
-from .states import EXPERIENCE, EDUCATION, TECH_STACK, LANGUAGES, READING
-from src.utils import go_to_menu, start_module, handle_error
+from .states import EXPERIENCE, EDUCATION, TECH_STACK, SOFT_SKILLS, READING
+from .utils import send_file
 
 
 async def handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -24,13 +24,22 @@ async def handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_experience(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text(
-        text=context.bot_data.get('experience.md'),
-        parse_mode=ParseMode.HTML,
-        reply_markup=reading_keyboard
-    )
+    await send_file(update=update, context=context, file_name='experience.md')
+    return READING
+
+
+async def handle_education(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await send_file(update=update, context=context, file_name='education.md')
+    return READING
+
+
+async def handle_tech_stack(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await send_file(update=update, context=context, file_name='tech_stack.md')
+    return READING
+
+
+async def handle_soft_skills(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await send_file(update=update, context=context, file_name='soft_skills.md')
     return READING
 
 
@@ -56,6 +65,9 @@ async def handle_cv_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 cv_conversation_handler = ConversationHandler(
     entry_points=[
         CallbackQueryHandler(callback=handle_experience, pattern=f'^{EXPERIENCE}$'),
+        CallbackQueryHandler(callback=handle_education, pattern=f'^{EDUCATION}$'),
+        CallbackQueryHandler(callback=handle_tech_stack, pattern=f'^{TECH_STACK}$'),
+        CallbackQueryHandler(callback=handle_soft_skills, pattern=f'^{SOFT_SKILLS}$'),
     ],
     states={
         READING: [
