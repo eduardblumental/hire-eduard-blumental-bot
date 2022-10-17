@@ -114,7 +114,7 @@ async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = create_msg_from_sender_and_form(sender=update.effective_user, form=context.user_data.get('form'))
-    save_msg_to_file(dir_name='messages', user_data=context.user_data, msg=msg)
+    save_msg_to_file(dir_name='msgs', user_data=context.user_data, msg=msg)
 
     await context.bot.send_message(
         chat_id=os.environ.get('TELEGRAM_USER_ID'),
