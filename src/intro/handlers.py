@@ -57,6 +57,11 @@ async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TY
     return ConversationHandler.END
 
 
+async def handle_watching_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_error(update=update, context=context, callback=handle_start_intro)
+    return ConversationHandler.END
+
+
 async def handle_intro_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await handle_error(update=update, context=context, callback=handle_start_intro)
 
@@ -69,6 +74,7 @@ intro_conversation_handler = ConversationHandler(
     states={
         WATCHING: [
             CallbackQueryHandler(callback=handle_back_to_intro, pattern=f'^{INTRO}$'),
+            MessageHandler(callback=handle_watching_error, filters=filters.ALL)
         ]
     },
     fallbacks=[

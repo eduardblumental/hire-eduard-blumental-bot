@@ -14,7 +14,8 @@ from src.states import CONTACT_ME, MAIN_MENU
 from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
-from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, CONTACT_PERSON, SUBMIT
+from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
+    CONTACT_PERSON_NAME, CONTACT_PERSON_POSITION, CONTACT_PERSON_EMAIL, SUBMIT
 from .utils import create_form_from_user_data, create_msg_from_sender_and_form, save_msg_to_file
 
 
@@ -55,7 +56,8 @@ async def handle_position_name(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def handle_position_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['position_description'] = update.message.text
+    if not context.user_data.get('position_description'):
+        context.user_data['position_description'] = update.message.text
     await update.message.reply_text(
         text='Please, type in salary range for the given position? Format: "min-max NIS/USD/EUR"',
         reply_markup=form_keyboard
@@ -66,14 +68,33 @@ async def handle_position_description(update: Update, context: ContextTypes.DEFA
 async def handle_salary_range(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['salary_range'] = update.message.text
     await update.message.reply_text(
-        text='Please, type in contact person contacts for the given position. Format: "Name Surname, Position, email@email.com"',
+        text='Please, type in contact person\'s full name.',
         reply_markup=form_keyboard
     )
-    return CONTACT_PERSON
+    return CONTACT_PERSON_NAME
 
 
-async def handle_contact_person(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['contact_person'] = update.message.text
+async def handle_contact_person_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['contact_person_name'] = update.message.text
+    await update.message.reply_text(
+        text='Please, type in contact person\'s position.',
+        reply_markup=form_keyboard
+    )
+    return CONTACT_PERSON_POSITION
+
+
+async def handle_contact_person_position(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.user_data.get('contact_person_position'):
+        context.user_data['contact_person_position'] = update.message.text
+    await update.message.reply_text(
+        text='Please, type in contact person\'s email.',
+        reply_markup=form_keyboard
+    )
+    return CONTACT_PERSON_EMAIL
+
+
+async def handle_contact_person_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['contact_person_email'] = update.message.text
     context.user_data['form'] = create_form_from_user_data(context.user_data)
 
     await update.message.reply_text(
@@ -92,7 +113,7 @@ async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = create_msg_from_sender_and_form(update.effective_user, context.user_data.get('form'))
+    msg = create_msg_from_sender_and_form(sender=update.effective_user, form=context.user_data.get('form'))
     save_msg_to_file(dir_name='messages', user_data=context.user_data, msg=msg)
 
     await context.bot.send_message(
@@ -114,7 +135,12 @@ async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def handle_salary_range_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await handle_error(update=update, context=context, callback=handle_position_description,
-                       error_message='Please, enter a valid salary range. Format: "min-max NIS/USD/EUR" ')
+                       error_message='Please, enter a valid salary range. Format: min-max NIS/USD/EUR')
+
+
+async def handle_contact_person_email_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_error(update=update, context=context, callback=handle_contact_person_position,
+                       error_message='Please, enter a valid email. Format: email@email.com')
 
 
 async def handle_contact_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -139,9 +165,17 @@ contact_me_conversation_handler = ConversationHandler(
             MessageHandler(callback=handle_salary_range, filters=filters.Regex(r"^\d+-\d+ (NIS|USD|EUR)$")),
             MessageHandler(callback=handle_salary_range_error, filters=filters.ALL)
         ],
-        CONTACT_PERSON: [
-            MessageHandler(callback=handle_contact_person, filters=filters.TEXT & ~filters.COMMAND)
-        ]
+        CONTACT_PERSON_NAME: [
+            MessageHandler(callback=handle_contact_person_name, filters=filters.TEXT & ~filters.COMMAND)
+        ],
+        CONTACT_PERSON_POSITION: [
+            MessageHandler(callback=handle_contact_person_position, filters=filters.TEXT & ~filters.COMMAND)
+        ],
+        CONTACT_PERSON_EMAIL: [
+            MessageHandler(callback=handle_contact_person_email,
+                           filters=filters.Regex(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]{2,63}\.[a-zA-Z0-9-.]+$")),
+            MessageHandler(callback=handle_contact_person_email_error, filters=filters.ALL)
+        ],
     },
     fallbacks=[
         CallbackQueryHandler(callback=handle_cancel, pattern=f'^{CONTACT_ME}$'),

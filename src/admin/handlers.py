@@ -12,6 +12,7 @@ async def handle_load_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('Uploading data...')
     video_dir = os.path.join('..', 'static', 'videos')
     markdown_dir = os.path.join('..', 'static', 'markdown')
+    update.message.video.file_id
 
     for video in os.listdir(video_dir):
         msg = await context.bot.send_video(
