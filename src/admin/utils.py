@@ -7,7 +7,8 @@ from telegram.constants import ParseMode
 
 async def send_files_to_admin_from_dir(update: Update, context: ContextTypes.DEFAULT_TYPE, dir_name):
     dir_path = os.path.join('..', dir_name)
-    for file_name in os.listdir(dir_path):
+    for num, file_name in enumerate(os.listdir(dir_path)):
         with open(os.path.join(dir_path, file_name), 'r', encoding='utf-8') as f:
             contents = f.read()
-            await update.message.reply_text(text=contents, parse_mode=ParseMode.HTML)
+            enumerated_contents = f'{num+1}. {contents}'
+            await update.message.reply_text(text=enumerated_contents, parse_mode=ParseMode.HTML)
