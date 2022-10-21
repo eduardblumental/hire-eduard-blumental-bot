@@ -10,7 +10,7 @@ from telegram.ext import (
 from src.states import CV, MAIN_MENU
 from src.utils import go_to_menu, start_module, handle_error
 
-from .keyboards import cv_keyboard, reading_keyboard
+from .keyboards import cv_keyboard
 from .states import EXPERIENCE, EDUCATION, TECH_STACK, SOFT_SKILLS, READING
 from .utils import send_file
 

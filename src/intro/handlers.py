@@ -10,7 +10,7 @@ from telegram.ext import (
 from src.states import INTRO, MAIN_MENU
 from src.utils import go_to_menu, start_module, handle_error
 
-from .keyboards import intro_keyboard, watching_keyboard
+from .keyboards import intro_keyboard
 from .states import MY_JOURNEY, WHY_HIRE_ME, WATCHING
 from .utils import send_video
 
@@ -24,18 +24,12 @@ async def handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def handle_my_journey(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await send_video(
-        update=update, context=context, filename='my_journey.mp4', caption='My journey 🏂',
-        reply_markup=watching_keyboard
-    )
+    await send_video(update=update, context=context, file_name='my_journey.mp4', caption='My journey 🏂')
     return WATCHING
 
 
 async def handle_why_hire_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await send_video(
-        update=update, context=context, filename='why_hire_me.mp4', caption='Why hire me 🔮',
-        reply_markup=watching_keyboard
-    )
+    await send_video(update=update, context=context, file_name='why_hire_me.mp4', caption='Why hire me 🔮')
     return WATCHING
 
 
@@ -87,4 +81,3 @@ intro_handlers = [
     CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
     MessageHandler(callback=handle_intro_error, filters=filters.ALL)
 ]
-
