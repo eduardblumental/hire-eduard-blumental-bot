@@ -1,3 +1,5 @@
+import logging
+
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -12,12 +14,15 @@ from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import social_media_keyboard
 
+logger = logging.getLogger('main_logger')
+
 
 async def handle_start_social(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
         text='Online Presence', reply_markup=social_media_keyboard
     )
+    logger.info(f'User {update.effective_user.username} entered section "Social".')
     return SOCIAL
 
 

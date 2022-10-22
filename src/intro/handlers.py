@@ -1,3 +1,5 @@
+import logging
+
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -14,12 +16,15 @@ from .keyboards import intro_keyboard
 from .states import MY_JOURNEY, WHY_HIRE_ME, WATCHING
 from .utils import send_video
 
+logger = logging.getLogger('main_logger')
+
 
 async def handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
         text='Introduction', reply_markup=intro_keyboard
     )
+    logger.info(f'User {update.effective_user.username} entered section "Intro".')
     return INTRO
 
 

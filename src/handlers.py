@@ -1,3 +1,5 @@
+import logging
+
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -15,9 +17,12 @@ from contact_me.handlers import handle_start_contact_me, contact_me_handlers
 from states import INTRO, SOCIAL, CV, CONTACT_ME
 from utils import go_to_menu, handle_error
 
+logger = logging.getLogger('main_logger')
+
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
+    logger.info(f'User {update.effective_user.username} started using the bot.')
 
 
 async def handle_main_menu_error(update: Update, context: ContextTypes.DEFAULT_TYPE):

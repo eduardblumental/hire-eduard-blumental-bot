@@ -1,3 +1,5 @@
+import logging
+
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -14,12 +16,15 @@ from .keyboards import cv_keyboard
 from .states import EXPERIENCE, EDUCATION, TECH_STACK, SOFT_SKILLS, READING
 from .utils import send_file
 
+logger = logging.getLogger('main_logger')
+
 
 async def handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
         text='CV', reply_markup=cv_keyboard
     )
+    logger.info(f'User {update.effective_user.username} entered section "CV".')
     return CV
 
 

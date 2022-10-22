@@ -1,8 +1,12 @@
+import logging
+
 from telegram import Update
 from telegram.error import BadRequest
 from telegram.ext import ContextTypes
 
 from .keyboards import watching_keyboard
+
+logger = logging.getLogger('main_logger')
 
 
 async def send_video(update: Update, context: ContextTypes.DEFAULT_TYPE, file_name, caption):
@@ -17,9 +21,11 @@ async def send_video(update: Update, context: ContextTypes.DEFAULT_TYPE, file_na
             caption=caption,
             reply_markup=watching_keyboard
         )
+        logger.info(f'User {update.effective_user.username} watched video "{file_name}".')
     except BadRequest as e:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="The video isn't available yet. Please, try again later.",
             reply_markup=watching_keyboard
         )
+        logger.error(f'Video "{file_name}" is not available. User {update.effective_user.username} could not watch it.')

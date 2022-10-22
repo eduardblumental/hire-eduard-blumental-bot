@@ -3,13 +3,12 @@ import logging
 
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 
-from admin.handlers import admin_handlers
 from handlers import handle_start, handle_main_menu_error, main_conversation_handler
+from utils import init_logger
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('main_logger')
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.INFO)
+from admin.handlers import admin_handlers
+
+logger = init_logger('main_logger', 'logs', 'HEBB.log', logging.INFO)
 
 
 if __name__ == '__main__':

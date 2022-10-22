@@ -1,3 +1,4 @@
+import logging
 import os
 
 from telegram import Update
@@ -17,6 +18,8 @@ from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
 from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
     CONTACT_PERSON_NAME, CONTACT_PERSON_POSITION, CONTACT_PERSON_EMAIL, SUBMIT
 from .utils import create_form_from_user_data, create_msg_from_sender_and_form, save_msg_to_file
+
+logger = logging.getLogger('main_logger')
 
 
 async def handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
