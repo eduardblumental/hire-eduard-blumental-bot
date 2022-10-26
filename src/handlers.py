@@ -14,15 +14,19 @@ from social.handlers import handle_start_social, social_handlers
 from cv.handlers import handle_start_cv, cv_handlers
 from contact_me.handlers import handle_start_contact_me, contact_me_handlers
 
+from keyboards import main_menu_keyboard
 from states import INTRO, SOCIAL, CV, CONTACT_ME
-from utils import go_to_menu, handle_error
+from utils import start_module, handle_error
 
 logger = logging.getLogger('main_logger')
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await go_to_menu(update, context)
-    logger.info(f'User {update.effective_user.username} started using the bot.')
+    await start_module(
+        update=update, context=context,
+        text='Main menu', reply_markup=main_menu_keyboard,
+        log_msg='Started using the bot.'
+    )
 
 
 async def handle_main_menu_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
