@@ -20,15 +20,14 @@ logger = logging.getLogger('main_logger')
 async def handle_start_social(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='Online Presence', reply_markup=social_media_keyboard
+        text='Online Presence', reply_markup=social_media_keyboard,
+        log_msg='Entered section "Social".'
     )
-    logger.info(msg=f'Entered section "Social".', extra={'username': update.effective_user.username})
     return SOCIAL
 
 
 async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
-    logger.info(msg=f'Went back to menu.', extra={'username': update.effective_user.username})
     return ConversationHandler.END
 
 

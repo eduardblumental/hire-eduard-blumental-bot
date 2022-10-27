@@ -1,4 +1,4 @@
-import logging
+import logging, os
 
 from telegram import Update
 from telegram.error import BadRequest
@@ -21,11 +21,15 @@ async def send_video(update: Update, context: ContextTypes.DEFAULT_TYPE, file_na
             caption=caption,
             reply_markup=watching_keyboard
         )
-        logger.info(f'User {update.effective_user.username} watched video "{file_name}".')
+        logger.info(msg=f'Watched video "{file_name}".', extra={'username': update.effective_user.username})
     except BadRequest as e:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="The video isn't available yet. Please, try again later.",
             reply_markup=watching_keyboard
         )
-        logger.error(f'Video "{file_name}" is not available. User {update.effective_user.username} could not watch it.')
+        await context.bot.send_message(
+            chat_id=os.environ.get('TELEGRAM_USER_ID'),
+            text=f'Video "{file_name}" is not available. Upload it ASAP.'
+        )
+        logger.error(msg=f'Video "{file_name}" is not available.', extra={'username': update.effective_user.username})

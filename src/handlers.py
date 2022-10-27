@@ -16,17 +16,13 @@ from contact_me.handlers import handle_start_contact_me, contact_me_handlers
 
 from keyboards import main_menu_keyboard
 from states import INTRO, SOCIAL, CV, CONTACT_ME
-from utils import start_module, handle_error
+from utils import go_to_menu, handle_error
 
 logger = logging.getLogger('main_logger')
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await start_module(
-        update=update, context=context,
-        text='Main menu', reply_markup=main_menu_keyboard,
-        log_msg='Started using the bot.'
-    )
+    await go_to_menu(update=update, context=context, log_msg='Started using the bot.')
 
 
 async def handle_main_menu_error(update: Update, context: ContextTypes.DEFAULT_TYPE):

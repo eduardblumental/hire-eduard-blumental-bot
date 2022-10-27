@@ -15,9 +15,9 @@ from src.states import CONTACT_ME, MAIN_MENU
 from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
-from .states import REACH_OUT, COMPANY_NAME, POSITION_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
+from .states import REACH_OUT, COMPANY_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
     CONTACT_PERSON_NAME, CONTACT_PERSON_POSITION, CONTACT_PERSON_EMAIL, SUBMIT
-from .utils import create_form_from_user_data, create_msg_from_sender_and_form, save_msg_to_file
+from .utils import process_form_entry, create_form_from_user_data, create_msg_from_sender_and_form, save_msg_to_file
 
 logger = logging.getLogger('main_logger')
 
@@ -25,7 +25,8 @@ logger = logging.getLogger('main_logger')
 async def handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='Contact me', reply_markup=reach_out_keyboard
+        text='Contact me', reply_markup=reach_out_keyboard,
+        log_msg='Entered section "Contact me".'
     )
     return CONTACT_ME
 
@@ -37,61 +38,51 @@ async def handle_reach_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text='Please, type in your company name.',
         reply_markup=form_keyboard
     )
+    logger.info(msg=f'Reached out directly.', extra={'username': update.effective_user.username})
     return COMPANY_NAME
 
 
 async def handle_company_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['company_name'] = update.message.text
-    await update.message.reply_text(
-        text='Please, type in position name.',
-        reply_markup=form_keyboard
-    )
-    return POSITION_NAME
-
-
-async def handle_position_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['position_name'] = update.message.text
-    await update.message.reply_text(
-        text='Please, type in position description & requirements.',
-        reply_markup=form_keyboard
+    await process_form_entry(
+        update=update, context=context, entry_name='company_name',
+        next_question='Please, type in position description & requirements.',
+        log_msg='Entered company name'
     )
     return POSITION_DESCRIPTION
 
 
 async def handle_position_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not context.user_data.get('position_description'):
-        context.user_data['position_description'] = update.message.text
-    await update.message.reply_text(
-        text='Please, type in salary range for the given position? Format: "min-max NIS/USD/EUR"',
-        reply_markup=form_keyboard
+    await process_form_entry(
+        update=update, context=context, entry_name='position_description',
+        next_question='Please, type in salary range for the given position? min-max NIS/USD/EUR',
+        log_msg='Entered position description.', log_response=False
     )
     return SALARY_RANGE
 
 
 async def handle_salary_range(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['salary_range'] = update.message.text
-    await update.message.reply_text(
-        text='Please, type in contact person\'s full name.',
-        reply_markup=form_keyboard
+    await process_form_entry(
+        update=update, context=context, entry_name='salary_range',
+        next_question='Please, type in contact person\'s full name.',
+        log_msg='Entered salary range'
     )
     return CONTACT_PERSON_NAME
 
 
 async def handle_contact_person_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['contact_person_name'] = update.message.text
-    await update.message.reply_text(
-        text='Please, type in contact person\'s position.',
-        reply_markup=form_keyboard
+    await process_form_entry(
+        update=update, context=context, entry_name='contact_person_name',
+        next_question='Please, type in contact person\'s position.',
+        log_msg='Entered contact person\'s full name'
     )
     return CONTACT_PERSON_POSITION
 
 
 async def handle_contact_person_position(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not context.user_data.get('contact_person_position'):
-        context.user_data['contact_person_position'] = update.message.text
-    await update.message.reply_text(
-        text='Please, type in contact person\'s email.',
-        reply_markup=form_keyboard
+    await process_form_entry(
+        update=update, context=context, entry_name='contact_person_position',
+        next_question='Please, type in contact person\'s email.',
+        log_msg='Entered contact person\'s position'
     )
     return CONTACT_PERSON_EMAIL
 
@@ -105,12 +96,16 @@ async def handle_contact_person_email(update: Update, context: ContextTypes.DEFA
         parse_mode=ParseMode.HTML,
         reply_markup=submit_keyboard
     )
+    logger.info(msg=f'Entered contact person\'s email "{context.user_data.get("contact_person_email")}".',
+                extra={'username': update.effective_user.username})
     return ConversationHandler.END
 
 
 async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    logger.info(msg=f'Canceled reaching out process.', extra={'username': update.effective_user.username})
+
     await handle_start_contact_me(update, context)
     return ConversationHandler.END
 
@@ -118,6 +113,7 @@ async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = create_msg_from_sender_and_form(sender=update.effective_user, form=context.user_data.get('form'))
     save_msg_to_file(dir_name='msgs', user_data=context.user_data, msg=msg)
+    logger.info(msg=f'Submitted form.', extra={'username': update.effective_user.username})
 
     await context.bot.send_message(
         chat_id=os.environ.get('TELEGRAM_USER_ID'),
@@ -138,12 +134,12 @@ async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def handle_salary_range_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await handle_error(update=update, context=context, callback=handle_position_description,
-                       error_message='Please, enter a valid salary range. Format: min-max NIS/USD/EUR')
+                       error_message='Please, use the following format: min-max NIS/USD/EUR')
 
 
 async def handle_contact_person_email_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await handle_error(update=update, context=context, callback=handle_contact_person_position,
-                       error_message='Please, enter a valid email. Format: email@email.com')
+                       error_message='Please, enter a valid email. Example: email@email.com')
 
 
 async def handle_contact_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -157,9 +153,6 @@ contact_me_conversation_handler = ConversationHandler(
     states={
         COMPANY_NAME: [
             MessageHandler(callback=handle_company_name, filters=filters.TEXT & ~filters.COMMAND)
-        ],
-        POSITION_NAME: [
-            MessageHandler(callback=handle_position_name, filters=filters.TEXT & ~filters.COMMAND)
         ],
         POSITION_DESCRIPTION: [
             MessageHandler(callback=handle_position_description, filters=filters.TEXT & ~filters.COMMAND)

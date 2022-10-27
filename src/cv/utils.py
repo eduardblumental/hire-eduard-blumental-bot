@@ -1,4 +1,4 @@
-import logging
+import logging, os
 
 from telegram import Update
 from telegram.error import BadRequest
@@ -20,10 +20,14 @@ async def send_file(update: Update, context: ContextTypes.DEFAULT_TYPE, file_nam
             parse_mode=ParseMode.HTML,
             reply_markup=reading_keyboard
         )
-        logger.info(f'User {update.effective_user.username} read "{file_name}".')
+        logger.info(msg=f'Read file "{file_name}".', extra={'username': update.effective_user.username})
     except BadRequest as e:
         await query.edit_message_text(
             text="The file isn't available yet. Please, try again later.",
             reply_markup=reading_keyboard
         )
-        logger.error(f'File "{file_name}" is not available. User {update.effective_user.username} could not read it.')
+        await context.bot.send_message(
+            chat_id=os.environ.get('TELEGRAM_USER_ID'),
+            text=f'File "{file_name}" is not available. Upload it ASAP.'
+        )
+        logger.error(msg=f'File "{file_name}" is not available.', extra={'username': update.effective_user.username})

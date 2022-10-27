@@ -22,9 +22,9 @@ logger = logging.getLogger('main_logger')
 async def handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='Introduction', reply_markup=intro_keyboard
+        text='Introduction', reply_markup=intro_keyboard,
+        log_msg='Entered section "Intro".'
     )
-    logger.info(f'User {update.effective_user.username} entered section "Intro".')
     return INTRO
 
 
@@ -48,10 +48,11 @@ async def handle_back_to_intro(update: Update, context: ContextTypes.DEFAULT_TYP
         text='Intro menu',
         reply_markup=intro_keyboard
     )
+    logger.info(msg=f'Went back to "Intro".', extra={'username': update.effective_user.username})
     return ConversationHandler.END
 
 
-async def q_handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await go_to_menu(update, context)
     return ConversationHandler.END
 
@@ -83,6 +84,6 @@ intro_conversation_handler = ConversationHandler(
 
 intro_handlers = [
     intro_conversation_handler,
-    CallbackQueryHandler(callback=q_handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
+    CallbackQueryHandler(callback=handle_back_to_menu, pattern=f'^{MAIN_MENU}$'),
     MessageHandler(callback=handle_intro_error, filters=filters.ALL)
 ]

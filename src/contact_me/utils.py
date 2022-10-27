@@ -1,5 +1,23 @@
 from datetime import date
-import os
+import logging, os
+
+from telegram import Update
+from telegram.ext import ContextTypes
+
+from .keyboards import form_keyboard
+
+logger = logging.getLogger('main_logger')
+
+
+async def process_form_entry(update:Update, context: ContextTypes.DEFAULT_TYPE,
+                             entry_name, next_question, log_msg, log_response=True):
+    if not context.user_data.get(entry_name):
+        context.user_data[entry_name] = update.message.text
+    await update.message.reply_text(text=next_question, reply_markup=form_keyboard)
+
+    if log_response:
+        log_msg = f'{log_msg} "{context.user_data.get(entry_name)}".'
+    logger.info(msg=log_msg, extra={'username': update.effective_user.username})
 
 
 def create_form_from_user_data(user_data):
