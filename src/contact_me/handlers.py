@@ -116,7 +116,7 @@ async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(msg=f'Submitted form.', extra={'username': update.effective_user.username})
 
     await context.bot.send_message(
-        chat_id=os.environ.get('TELEGRAM_USER_ID'),
+        chat_id=os.environ.get('ADMIN_TELEGRAM_USER_ID'),
         text=msg,
         parse_mode=ParseMode.HTML
     )

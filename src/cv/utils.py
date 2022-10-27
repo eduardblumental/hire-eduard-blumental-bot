@@ -27,7 +27,7 @@ async def send_file(update: Update, context: ContextTypes.DEFAULT_TYPE, file_nam
             reply_markup=reading_keyboard
         )
         await context.bot.send_message(
-            chat_id=os.environ.get('TELEGRAM_USER_ID'),
+            chat_id=os.environ.get('ADMIN_TELEGRAM_USER_ID'),
             text=f'File "{file_name}" is not available. Upload it ASAP.'
         )
         logger.error(msg=f'File "{file_name}" is not available.', extra={'username': update.effective_user.username})

@@ -17,7 +17,7 @@ from .utils import send_files_to_admin_from_dir
 
 
 async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if os.environ.get('TELEGRAM_USER_ID') != str(update.effective_user.id):
+    if os.environ.get('ADMIN_TELEGRAM_USER_ID') != str(update.effective_user.id):
         await handle_main_menu_error(update, context)
         return
 
@@ -33,7 +33,7 @@ async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_upload_file_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if os.environ.get('TELEGRAM_USER_ID') != str(update.effective_user.id):
+    if os.environ.get('ADMIN_TELEGRAM_USER_ID') != str(update.effective_user.id):
         await handle_main_menu_error(update, context)
         return
 
@@ -42,7 +42,7 @@ async def handle_upload_file_command(update: Update, context: ContextTypes.DEFAU
 
 
 async def handle_upload_video_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if os.environ.get('TELEGRAM_USER_ID') != str(update.effective_user.id):
+    if os.environ.get('ADMIN_TELEGRAM_USER_ID') != str(update.effective_user.id):
         await handle_main_menu_error(update, context)
         return
 
@@ -71,7 +71,7 @@ async def handle_upload_video(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def handle_view_msgs(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if os.environ.get('TELEGRAM_USER_ID') != str(update.effective_user.id):
+    if os.environ.get('ADMIN_TELEGRAM_USER_ID') != str(update.effective_user.id):
         await handle_main_menu_error(update, context)
         return
 
@@ -80,7 +80,7 @@ async def handle_view_msgs(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_view_logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if os.environ.get('TELEGRAM_USER_ID') != str(update.effective_user.id):
+    if os.environ.get('ADMIN_TELEGRAM_USER_ID') != str(update.effective_user.id):
         await handle_main_menu_error(update, context)
         return
 

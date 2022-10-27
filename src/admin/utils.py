@@ -10,5 +10,5 @@ async def send_files_to_admin_from_dir(update: Update, context: ContextTypes.DEF
     for num, file_name in enumerate(os.listdir(dir_path)):
         with open(os.path.join(dir_path, file_name), 'r', encoding='utf-8') as f:
             contents = f.read()
-            enumerated_contents = f'{num+1}. {contents}'
+            enumerated_contents = f'{num+1}. {contents[-4000:]}'
             await update.message.reply_text(text=enumerated_contents, parse_mode=ParseMode.HTML)

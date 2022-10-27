@@ -29,7 +29,7 @@ async def send_video(update: Update, context: ContextTypes.DEFAULT_TYPE, file_na
             reply_markup=watching_keyboard
         )
         await context.bot.send_message(
-            chat_id=os.environ.get('TELEGRAM_USER_ID'),
+            chat_id=os.environ.get('ADMIN_TELEGRAM_USER_ID'),
             text=f'Video "{file_name}" is not available. Upload it ASAP.'
         )
         logger.error(msg=f'Video "{file_name}" is not available.', extra={'username': update.effective_user.username})
