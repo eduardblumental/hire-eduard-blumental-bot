@@ -54,7 +54,7 @@ async def handle_company_name(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def handle_position_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await process_form_entry(
         update=update, context=context, entry_name='position_description',
-        next_question='Please, type in salary range for the given position? min-max NIS/USD/EUR',
+        next_question='Please, type in salary range for the given position? min-max NIS/USD',
         log_msg='Entered position description.', log_response=False
     )
     return SALARY_RANGE
@@ -104,6 +104,7 @@ async def handle_contact_person_email(update: Update, context: ContextTypes.DEFA
 async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    context.user_data.clear()
     logger.info(msg=f'Canceled reaching out process.', extra={'username': update.effective_user.username})
 
     await handle_start_contact_me(update, context)
@@ -113,6 +114,7 @@ async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = create_msg_from_sender_and_form(sender=update.effective_user, form=context.user_data.get('form'))
     save_msg_to_file(dir_name='msgs', user_data=context.user_data, msg=msg)
+    context.user_data.clear()
     logger.info(msg=f'Submitted form.', extra={'username': update.effective_user.username})
 
     await context.bot.send_message(
@@ -134,7 +136,7 @@ async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def handle_salary_range_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await handle_error(update=update, context=context, callback=handle_position_description,
-                       error_message='Please, use the following format: min-max NIS/USD/EUR')
+                       error_message='Please, use the following format: min-max NIS/USD')
 
 
 async def handle_contact_person_email_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -158,7 +160,7 @@ contact_me_conversation_handler = ConversationHandler(
             MessageHandler(callback=handle_position_description, filters=filters.TEXT & ~filters.COMMAND)
         ],
         SALARY_RANGE: [
-            MessageHandler(callback=handle_salary_range, filters=filters.Regex(r"^\d+-\d+ (NIS|USD|EUR)$")),
+            MessageHandler(callback=handle_salary_range, filters=filters.Regex(r"^\d+-\d+ (NIS|USD)$")),
             MessageHandler(callback=handle_salary_range_error, filters=filters.ALL)
         ],
         CONTACT_PERSON_NAME: [
