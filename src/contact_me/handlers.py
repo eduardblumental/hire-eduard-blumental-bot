@@ -23,9 +23,15 @@ logger = logging.getLogger('main_logger')
 
 
 async def handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    contacts = "To tell me about career opportunities at you company, feel free to\n\n" \
+               "# write me on <a href=\"https://www.linkedin.com/in/eduard-blumental-2b8898133/\">LinkedIn</a>\n" \
+               "# email me at eduard.blumental@gmail.com\n" \
+               "# call me at +972545201432\n\nOR\n\n" \
+               "Be the coolest person and reach me out directly 🔥🔥🔥"
+
     await start_module(
         update=update, context=context,
-        text='Contact me', reply_markup=reach_out_keyboard,
+        text=contacts, reply_markup=reach_out_keyboard,
         log_msg='Entered section "Contact me".'
     )
     return CONTACT_ME

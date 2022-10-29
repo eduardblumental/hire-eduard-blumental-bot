@@ -3,6 +3,7 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from keyboards import main_menu_keyboard
@@ -19,15 +20,15 @@ async def start_module(update: Update, context: ContextTypes.DEFAULT_TYPE, text,
     query = update.callback_query
     if query:
         await query.answer()
-        await query.edit_message_text(**message_kwargs)
+        await query.edit_message_text(**message_kwargs, parse_mode=ParseMode.HTML)
     else:
-        await update.effective_message.reply_text(**message_kwargs)
+        await update.effective_message.reply_text(**message_kwargs, parse_mode=ParseMode.HTML)
 
     logger.info(log_msg, extra={'username': update.effective_user.username})
 
 
 async def go_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE,
-                     text='Main Menu', log_msg='Went back to menu.'):
+                     text="What's next? 👀", log_msg='Went back to menu.'):
     await start_module(update, context, text, main_menu_keyboard, log_msg)
 
 

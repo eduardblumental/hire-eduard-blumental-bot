@@ -20,7 +20,7 @@ logger = logging.getLogger('main_logger')
 async def handle_start_social(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='Online Presence', reply_markup=social_media_keyboard,
+        text='Connect on social media 📡', reply_markup=social_media_keyboard,
         log_msg='Entered section "Social".'
     )
     return SOCIAL

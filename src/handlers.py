@@ -14,7 +14,6 @@ from social.handlers import handle_start_social, social_handlers
 from cv.handlers import handle_start_cv, cv_handlers
 from contact_me.handlers import handle_start_contact_me, contact_me_handlers
 
-from keyboards import main_menu_keyboard
 from states import INTRO, SOCIAL, CV, CONTACT_ME
 from utils import go_to_menu, handle_error
 
@@ -22,7 +21,12 @@ logger = logging.getLogger('main_logger')
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await go_to_menu(update=update, context=context, log_msg='Started using the bot.')
+    await go_to_menu(
+        update=update, context=context,
+        text="Welcome! My name is HireEduardBlumentalBot. I am here to tell you more about Eduard " \
+             "and help you make a hiring decision of a lifetime. Have fun! 😉",
+        log_msg='Started using the bot.'
+    )
 
 
 async def handle_main_menu_error(update: Update, context: ContextTypes.DEFAULT_TYPE):

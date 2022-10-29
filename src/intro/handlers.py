@@ -22,7 +22,7 @@ logger = logging.getLogger('main_logger')
 async def handle_start_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='Introduction', reply_markup=intro_keyboard,
+        text='Watch a short video where I tell you more about myself 📺', reply_markup=intro_keyboard,
         log_msg='Entered section "Intro".'
     )
     return INTRO

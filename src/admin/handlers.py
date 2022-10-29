@@ -1,4 +1,5 @@
 import os
+from urllib import request
 
 from telegram import Update
 from telegram.ext import (
@@ -52,7 +53,9 @@ async def handle_upload_video_command(update: Update, context: ContextTypes.DEFA
 
 async def handle_upload_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_name = update.message.caption if update.message.caption else update.message.document.file_name
-    context.bot_data[file_name] = update.message.document.file_id
+    file = await context.bot.get_file(update.message.document.file_id)
+    file_contents = request.urlopen(file.file_path).read().decode('utf-8')
+    context.bot_data[file_name] = file_contents
 
     await update.message.reply_text(f'File {file_name} has been successfully uploaded.')
     await handle_admin(update, context)

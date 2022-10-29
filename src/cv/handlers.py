@@ -22,7 +22,7 @@ logger = logging.getLogger('main_logger')
 async def handle_start_cv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_module(
         update=update, context=context,
-        text='CV', reply_markup=cv_keyboard,
+        text='View my credentials 🔍', reply_markup=cv_keyboard,
         log_msg='Entered section "CV".'
     )
     return CV
