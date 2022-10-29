@@ -18,7 +18,8 @@ async def send_file(update: Update, context: ContextTypes.DEFAULT_TYPE, file_nam
         await query.edit_message_text(
             text=context.bot_data.get(file_name),
             parse_mode=ParseMode.HTML,
-            reply_markup=reading_keyboard
+            reply_markup=reading_keyboard,
+            disable_web_page_preview=True
         )
         logger.info(msg=f'Read file "{file_name}".', extra={'username': update.effective_user.username})
     except BadRequest as e:
