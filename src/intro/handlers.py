@@ -14,7 +14,7 @@ from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import intro_keyboard
 from .states import MY_JOURNEY, WHY_HIRE_ME, WATCHING
-from .utils import send_video
+from .utils import send_video, safely_delete_message
 
 logger = logging.getLogger('main_logger')
 
@@ -39,10 +39,7 @@ async def handle_why_hire_me(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def handle_back_to_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await query.delete_message()
-
+    await safely_delete_message(update, context)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text='Intro menu',
