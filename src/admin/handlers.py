@@ -1,4 +1,4 @@
-import os
+import json, os
 from urllib import request
 
 from telegram import Update
@@ -14,7 +14,7 @@ from telegram.constants import ParseMode
 from src.handlers import handle_main_menu_error, handle_error
 
 from .states import UPLOAD_FILE, UPLOAD_VIDEO
-from .utils import send_files_to_admin_from_dir
+from .utils import send_files_to_admin_from_dir, backup_data, recover_data_from_backup
 
 
 async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -28,7 +28,8 @@ async def handle_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
                          "Upload file: /upload_file\n" \
                          "Upload video: /upload_video\n" \
                          "View positions: /msgs\n" \
-                         "View logs: /logs"
+                         "View logs: /logs\n" \
+                         "Recover data: /recover_data"
 
     await update.message.reply_text(text=available_commands, parse_mode=ParseMode.HTML)
 
@@ -56,6 +57,7 @@ async def handle_upload_file(update: Update, context: ContextTypes.DEFAULT_TYPE)
     file = await context.bot.get_file(update.message.document.file_id)
     file_contents = request.urlopen(file.file_path).read().decode('utf-8')
     context.bot_data[file_name] = file_contents
+    backup_data(context.bot_data, '../data', 'backup.json')
 
     await update.message.reply_text(f'File "{file_name}" has been successfully uploaded.')
     await handle_admin(update, context)
@@ -66,6 +68,7 @@ async def handle_upload_file(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def handle_upload_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_name = update.message.caption if update.message.caption else update.message.video.file_name
     context.bot_data[file_name] = update.message.video.file_id
+    backup_data(context.bot_data, '../data', 'backup.json')
 
     await update.message.reply_text(f'Video "{file_name}" has been successfully uploaded.')
     await handle_admin(update, context)
@@ -88,6 +91,15 @@ async def handle_view_logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await send_files_to_admin_from_dir(update=update, context=context, dir_name='logs')
+    await handle_admin(update, context)
+
+
+async def handle_recover_data_from_backup(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if os.environ.get('ADMIN_TELEGRAM_USER_ID') != str(update.effective_user.id):
+        await handle_main_menu_error(update, context)
+        return
+
+    await recover_data_from_backup(update, context, '../data', 'backup.json')
     await handle_admin(update, context)
 
 
@@ -115,5 +127,6 @@ admin_handlers = [
     CommandHandler(callback=handle_admin, command='admin'),
     load_data_conversation,
     CommandHandler(callback=handle_view_msgs, command='msgs'),
-    CommandHandler(callback=handle_view_logs, command='logs')
+    CommandHandler(callback=handle_view_logs, command='logs'),
+    CommandHandler(callback=handle_recover_data_from_backup, command='recover_data')
 ]
