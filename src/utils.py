@@ -28,7 +28,7 @@ async def start_module(update: Update, context: ContextTypes.DEFAULT_TYPE, text,
 
 
 async def go_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE,
-                     text="What's next? 👀", log_msg='Went back to menu.'):
+                     text="What else can I do for you? 👀", log_msg='Went back to menu.'):
     await start_module(update, context, text, main_menu_keyboard, log_msg)
 
 
