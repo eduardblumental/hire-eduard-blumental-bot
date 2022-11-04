@@ -15,8 +15,8 @@ from src.states import CONTACT_ME, MAIN_MENU
 from src.utils import go_to_menu, start_module, handle_error
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
-from .states import REACH_OUT, COMPANY_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
-    CONTACT_PERSON_NAME, CONTACT_PERSON_POSITION, CONTACT_PERSON_EMAIL, SUBMIT
+from .states import START_FORM, COMPANY_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
+    CONTACT_PERSON_NAME, CONTACT_PERSON_EMAIL, SUBMIT
 from .utils import process_form_entry, create_form_from_user_data, create_msg_from_sender_and_form, save_msg_to_file
 
 logger = logging.getLogger('main_logger')
@@ -24,10 +24,9 @@ logger = logging.getLogger('main_logger')
 
 async def handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_TYPE):
     contacts = "To tell me about career opportunities at you company, feel free to\n\n" \
-               "# write me on <a href=\"https://www.linkedin.com/in/eduard-blumental-2b8898133/\">LinkedIn</a>\n" \
-               "# email me at eduard.blumental@gmail.com\n" \
-               "# call me at +972545201432\n\nOR\n\n" \
-               "Be the coolest person and reach me out directly 🔥🔥🔥"
+               "• Contact me on LinkedIn 👨🏻‍💻\n\n" \
+               "• Text me on Telegram 🚀\n\n" \
+               "• Be the coolest person and submit your vacancy directly 🔥🔥🔥"
 
     await start_module(
         update=update, context=context,
@@ -37,22 +36,23 @@ async def handle_start_contact_me(update: Update, context: ContextTypes.DEFAULT_
     return CONTACT_ME
 
 
-async def handle_reach_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_start_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(
-        text='Please, type in your company name.',
+        text='Step 1/5. Please, type in your company name.',
         reply_markup=form_keyboard
     )
-    logger.info(msg=f'Reached out directly.', extra={'username': update.effective_user.username})
+    context.user_data.clear()
+    logger.info(msg=f'Started filling the form.', extra={'username': update.effective_user.username})
     return COMPANY_NAME
 
 
 async def handle_company_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await process_form_entry(
         update=update, context=context, entry_name='company_name',
-        next_question='Please, type in position description & requirements.',
-        log_msg='Entered company name'
+        next_question='Step 2/5. Please, type in position description & requirements.',
+        log_msg='Step 1/5. Entered company name'
     )
     return POSITION_DESCRIPTION
 
@@ -60,8 +60,8 @@ async def handle_company_name(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def handle_position_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await process_form_entry(
         update=update, context=context, entry_name='position_description',
-        next_question='Please, type in salary range for the given position? min-max NIS/USD',
-        log_msg='Entered position description.', log_response=False
+        next_question='Step 3/5. Please, type in salary range for the given position.',
+        log_msg='Step 2/5. Entered position description.', log_response=False
     )
     return SALARY_RANGE
 
@@ -69,8 +69,8 @@ async def handle_position_description(update: Update, context: ContextTypes.DEFA
 async def handle_salary_range(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await process_form_entry(
         update=update, context=context, entry_name='salary_range',
-        next_question='Please, type in contact person\'s full name.',
-        log_msg='Entered salary range'
+        next_question='Step 4/5. Please, type in contact person\'s full name.',
+        log_msg='Step 3/5. Entered salary range'
     )
     return CONTACT_PERSON_NAME
 
@@ -78,17 +78,8 @@ async def handle_salary_range(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def handle_contact_person_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await process_form_entry(
         update=update, context=context, entry_name='contact_person_name',
-        next_question='Please, type in contact person\'s position.',
-        log_msg='Entered contact person\'s full name'
-    )
-    return CONTACT_PERSON_POSITION
-
-
-async def handle_contact_person_position(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await process_form_entry(
-        update=update, context=context, entry_name='contact_person_position',
-        next_question='Please, type in contact person\'s email.',
-        log_msg='Entered contact person\'s position'
+        next_question='Step 5/5. Please, type in contact person\'s email.',
+        log_msg='Step 4/5. Entered contact person\'s full name'
     )
     return CONTACT_PERSON_EMAIL
 
@@ -102,7 +93,7 @@ async def handle_contact_person_email(update: Update, context: ContextTypes.DEFA
         parse_mode=ParseMode.HTML,
         reply_markup=submit_keyboard
     )
-    logger.info(msg=f'Entered contact person\'s email "{context.user_data.get("contact_person_email")}".',
+    logger.info(msg=f'Step 5/5. Entered contact person\'s email "{context.user_data.get("contact_person_email")}".',
                 extra={'username': update.effective_user.username})
     return ConversationHandler.END
 
@@ -110,7 +101,6 @@ async def handle_contact_person_email(update: Update, context: ContextTypes.DEFA
 async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    context.user_data.clear()
     logger.info(msg=f'Canceled reaching out process.', extra={'username': update.effective_user.username})
 
     await handle_start_contact_me(update, context)
@@ -120,6 +110,7 @@ async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_submit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = create_msg_from_sender_and_form(sender=update.effective_user, form=context.user_data.get('form'))
     save_msg_to_file(dir_name='msgs', user_data=context.user_data, msg=msg)
+
     context.user_data.clear()
     logger.info(msg=f'Submitted form.', extra={'username': update.effective_user.username})
 
@@ -140,14 +131,9 @@ async def handle_back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE
     return ConversationHandler.END
 
 
-async def handle_salary_range_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await handle_error(update=update, context=context, callback=handle_position_description,
-                       error_message='Please, use the following format: min-max NIS/USD')
-
-
 async def handle_contact_person_email_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await handle_error(update=update, context=context, callback=handle_contact_person_position,
-                       error_message='Please, enter a valid email. Example: email@email.com')
+    await handle_error(update=update, context=context, callback=handle_contact_person_name,
+                       error_message='Please, enter a valid email address. Example: email@email.com')
 
 
 async def handle_contact_me_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -156,7 +142,7 @@ async def handle_contact_me_error(update: Update, context: ContextTypes.DEFAULT_
 
 contact_me_conversation_handler = ConversationHandler(
     entry_points=[
-        CallbackQueryHandler(callback=handle_reach_out, pattern=f'^{REACH_OUT}$')
+        CallbackQueryHandler(callback=handle_start_form, pattern=f'^{START_FORM}$')
     ],
     states={
         COMPANY_NAME: [
@@ -166,14 +152,10 @@ contact_me_conversation_handler = ConversationHandler(
             MessageHandler(callback=handle_position_description, filters=filters.TEXT & ~filters.COMMAND)
         ],
         SALARY_RANGE: [
-            MessageHandler(callback=handle_salary_range, filters=filters.Regex(r"^\d+-\d+ (NIS|USD)$")),
-            MessageHandler(callback=handle_salary_range_error, filters=filters.ALL)
+            MessageHandler(callback=handle_salary_range, filters=filters.TEXT & ~filters.COMMAND),
         ],
         CONTACT_PERSON_NAME: [
             MessageHandler(callback=handle_contact_person_name, filters=filters.TEXT & ~filters.COMMAND)
-        ],
-        CONTACT_PERSON_POSITION: [
-            MessageHandler(callback=handle_contact_person_position, filters=filters.TEXT & ~filters.COMMAND)
         ],
         CONTACT_PERSON_EMAIL: [
             MessageHandler(callback=handle_contact_person_email,

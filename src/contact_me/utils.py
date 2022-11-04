@@ -25,7 +25,7 @@ def create_form_from_user_data(user_data):
            f"<b>Position description</b>\n{user_data.get('position_description')}\n\n" \
            f"<b>Salary range</b>\n{user_data.get('salary_range')}\n\n" \
            f"<b>Contact person</b>\n{user_data.get('contact_person_name')}, " \
-           f"{user_data.get('contact_person_position')}\n{user_data.get('contact_person_email')}"
+           f"{user_data.get('contact_person_email')}"
 
     return form
 

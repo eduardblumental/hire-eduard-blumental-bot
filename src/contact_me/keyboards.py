@@ -2,13 +2,18 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 from src.states import MAIN_MENU, CONTACT_ME
 
-from .states import REACH_OUT, SUBMIT
+from .states import START_FORM, SUBMIT
 
 
 reach_out_keyboard = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton('Reach out directly 🚀', callback_data=REACH_OUT)
+            InlineKeyboardButton('Submit vacancy directly 🔥', callback_data=START_FORM)
+        ],
+        [
+
+            InlineKeyboardButton('Telegram 🚀', url='https://t.me/eduard_b7'),
+            InlineKeyboardButton('LinkedIn 👨🏻‍💻', url='https://www.linkedin.com/in/eduard-blumental-2b8898133/')
         ],
         [
             InlineKeyboardButton('Back to menu 👀', callback_data=MAIN_MENU)
@@ -30,7 +35,7 @@ submit_keyboard = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton('Submit 🕊', callback_data=SUBMIT),
-            InlineKeyboardButton('Retry 🔄', callback_data=REACH_OUT),
+            InlineKeyboardButton('Retry 🔄', callback_data=START_FORM),
 
         ],
         [
