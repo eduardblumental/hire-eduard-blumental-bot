@@ -9,8 +9,8 @@ from telegram.ext import (
     filters
 )
 
-from src.states import CV, MAIN_MENU
-from src.utils import go_to_menu, start_module, handle_error
+from states import CV, MAIN_MENU
+from utils import go_to_menu, start_module, handle_error
 
 from .keyboards import cv_keyboard
 from .states import EXPERIENCE, EDUCATION, TECH_STACK, SOFT_SKILLS, READING

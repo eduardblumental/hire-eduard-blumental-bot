@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from src.states import MAIN_MENU
+from states import MAIN_MENU
 
 social_media_keyboard = InlineKeyboardMarkup(
     [

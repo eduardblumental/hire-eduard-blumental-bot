@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from src.states import MAIN_MENU, CV
+from states import MAIN_MENU, CV
 
 from .states import EXPERIENCE, EDUCATION, TECH_STACK, SOFT_SKILLS
 

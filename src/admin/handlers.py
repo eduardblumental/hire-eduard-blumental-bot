@@ -11,7 +11,7 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-from src.handlers import handle_main_menu_error, handle_error
+from handlers import handle_main_menu_error, handle_error
 
 from .states import UPLOAD_FILE, UPLOAD_VIDEO
 from .utils import send_files_to_admin_from_dir, backup_data, recover_data_from_backup

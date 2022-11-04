@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from src.states import MAIN_MENU, ABOUT
+from states import MAIN_MENU, ABOUT
 
 from .states import ABOUT_ME, ABOUT_BOT
 

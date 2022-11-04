@@ -1,4 +1,4 @@
-from src.states import CONTACT_ME
+from states import CONTACT_ME
 
 START_FORM = CONTACT_ME + '0'
 COMPANY_NAME = CONTACT_ME + '1'

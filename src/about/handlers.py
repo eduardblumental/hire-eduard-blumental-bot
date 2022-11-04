@@ -9,8 +9,8 @@ from telegram.ext import (
     filters
 )
 
-from src.states import ABOUT, MAIN_MENU
-from src.utils import go_to_menu, start_module, handle_error
+from states import ABOUT, MAIN_MENU
+from utils import go_to_menu, start_module, handle_error
 
 from .keyboards import about_keyboard
 from .states import ABOUT_ME, ABOUT_BOT, WATCHING

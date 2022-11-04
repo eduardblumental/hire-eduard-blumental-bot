@@ -11,8 +11,8 @@ from telegram.ext import (
     filters
 )
 
-from src.states import CONTACT_ME, MAIN_MENU
-from src.utils import go_to_menu, start_module, handle_error
+from states import CONTACT_ME, MAIN_MENU
+from utils import go_to_menu, start_module, handle_error
 
 from .keyboards import form_keyboard, reach_out_keyboard, submit_keyboard
 from .states import START_FORM, COMPANY_NAME, POSITION_DESCRIPTION, SALARY_RANGE, \
